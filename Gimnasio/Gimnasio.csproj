@@ -246,6 +246,7 @@
     </Compile>
     <Compile Include="Utilidades\clsGrafico.cs" />
     <Compile Include="Utilidades\clsModulo.cs" />
+    <Compile Include="Utilidades\clsSistemaApertura.cs" />
     <Compile Include="Utilidades\clsUsuario.cs" />
     <Compile Include="Utilidades\frmPadre.cs">
       <SubType>Form</SubType>

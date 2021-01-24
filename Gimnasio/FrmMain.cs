@@ -9,11 +9,19 @@ using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 using System.Configuration;
 using System.IO.Ports;
+using System.Threading;
+using System.Net;
+using System.IO;
+using System.Net.Sockets;
+using Gimnasio.Socios;
+using Gimnasio.Utilidades;
 
 namespace Gimnasio
 {
     public partial class FrmMain : Form
     {
+        Registro.frmRegistro frmMNFC;
+        System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
         public FrmMain()
         {
             InitializeComponent();
@@ -52,6 +60,80 @@ namespace Gimnasio
 
             if (Utilidades.clsUsuario.existeSesion)
                 panel1.Enabled = true;
+
+            Thread thdUDPServer = new Thread(new ThreadStart(serverThread));
+            thdUDPServer.Start();
+        }
+
+        /// <summary>
+        /// UpdConnection
+        /// </summary>
+        private void serverThread()
+        {
+            //UPD Service Configuration
+            int listenPort = 11000;
+            UdpClient listener = new UdpClient(listenPort);
+
+            try
+            {
+                while (true)
+                {
+                    IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
+                    byte[] bytes = listener.Receive(ref RemoteIpEndPoint);
+                    string idUsuario = Encoding.ASCII.GetString(bytes, 0, bytes.Length);
+
+                    this.Invoke(new MethodInvoker(delegate ()
+                    {
+                        //Variables de comprobación
+                        bool comprobarSocio = false;
+
+                        clsSistemaApertura torno = new clsSistemaApertura();
+                        comprobarSocio = torno.comprobarSocio(idUsuario);
+
+                        if (comprobarSocio == true)
+                        {
+                            if (!detectarFormularioAbierto("frmRegistro"))
+                            {
+                                frmMNFC = new Registro.frmRegistro("RegistroNFC", idUsuario);
+                                frmMNFC.ShowDialog();
+                                frmMNFC.WindowState = FormWindowState.Normal;
+                            }
+                            torno.abrir();
+                            //System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
+                            //timer.Tick += new EventHandler(timerEvent);
+                            //timer.Interval = 5000;
+                            //timer.Start();
+                        }
+                        else
+                        {
+                            if (!detectarFormularioAbierto("frmRegistro"))
+                            {
+                                frmMNFC = new Registro.frmRegistro("RegistroNFC", idUsuario);
+                                frmMNFC.Show();
+                                frmMNFC.WindowState = FormWindowState.Normal;
+                            }
+                            
+                            //timer.Tick += new EventHandler(timerEvent);
+                            //timer.Interval = 5000;
+                            //timer.Start();
+                        }
+                       
+                        //Código para escribir en el textbox los datos del usuario
+                        //listBox_received.Items.Add(RemoteIpEndPoint.Address.ToString() + ": Membresia(" + membresia + "), Vencimiento(" + fechaVencimiento + ")");
+                        //listBox_received.SelectedIndex = listBox_received.Items.Count - 1;
+                        //listBox_received.SelectedIndex = -1;
+                    }));
+                }
+            }
+            catch (SocketException e)
+            {
+                Console.WriteLine(e);
+            }
+            finally
+            {
+                listener.Close();
+            }
+
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -79,6 +161,13 @@ namespace Gimnasio
         }
 
         #region METODOS PRIVADOS
+
+        private void timerEvent(Object myObject, EventArgs myEventArgs)
+        {
+            frmMNFC.Close();
+            timer.Stop();
+        }
+
         private bool detectarFormularioAbierto(string formulario)
         {
             bool abierto = false;
@@ -234,20 +323,42 @@ namespace Gimnasio
         {
             try
             {
-                SerialPort ArduinoPort;
-                ArduinoPort = new SerialPort();
-                ArduinoPort.PortName = "COM3";
-                ArduinoPort.BaudRate = 9600;
-                if (!ArduinoPort.IsOpen)
-                    ArduinoPort.Open();
-                ArduinoPort.Write("@");
-                ArduinoPort.Close();
+                #region TCP
+                //string requestUrl = "http://192.168.0.36/";
+                //WebRequest request = HttpWebRequest.Create(requestUrl);
+                //request.Method = "POST";
+                //request.ContentType = "application/x-www-form-urlencoded";
+                //string postData = "myparam1=myvalue1&myparam2=myvalue2";
+                //using (var writer = new StreamWriter(request.GetRequestStream()))
+                //{
+                //    writer.Write(postData);
+                //}
+                //string responseFromRemoteServer;
+                //using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                //{
+                //    using (StreamReader reader = new StreamReader(response.GetResponseStream()))
+                //    {
+                //        responseFromRemoteServer = reader.ReadToEnd();
+                //    }
+                //}
+                #endregion
 
-                MessageBox.Show("Puerta abierta");
+                #region UPD
+                IPAddress ip = new IPAddress(Convert.ToByte("192.168.0.102"));
+                string port = "8080";
+                string mensaje = "LFT";
+
+                UdpClient udpClient = new UdpClient();
+                udpClient.Connect(ip, Convert.ToInt16(port));
+                Byte[] senddata = Encoding.ASCII.GetBytes(mensaje);
+                udpClient.Send(senddata, senddata.Length);
+
+                MessageBox.Show("Puerta Abierta");
+                #endregion
             }
-            catch
+            catch (Exception ex)
             {
-                MessageBox.Show("Conecta el arduino");
+                Console.WriteLine(ex.ToString());
             }
         }
 
@@ -363,6 +474,16 @@ namespace Gimnasio
         }
 
         private void acercaDeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label12_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label13_Click(object sender, EventArgs e)
         {
 
         }

@@ -12,10 +12,19 @@ namespace Gimnasio.Registro
     public partial class frmRegistro : Form
     {
         clsRegistro oRegistro;
+        string idUsuario = string.Empty;
+        string sourceTrigger = string.Empty;
         public frmRegistro()
         {
             InitializeComponent();
         }
+        public frmRegistro(string source, string id)
+        {
+            idUsuario = id;
+            sourceTrigger = source;
+            InitializeComponent(source);
+        }
+
 
         private void frmRegistro_Load(object sender, EventArgs e)
         {
@@ -23,6 +32,14 @@ namespace Gimnasio.Registro
             Utilidades.clsGrafico.centraX(this, panelEncabezado);
             Utilidades.clsGrafico.centraX(this, panelFoot);
             cargaDatos();
+        }
+
+        private void frmRegistro_LoadNFC(object sender, EventArgs e)
+        {
+            Utilidades.clsGrafico.centraX(this, panelContenedor);
+            Utilidades.clsGrafico.centraX(this, panelEncabezado);
+            Utilidades.clsGrafico.centraX(this, panelFoot);
+            cargaDatosNFC();
         }
 
         private void cargaDatos()
@@ -45,6 +62,30 @@ namespace Gimnasio.Registro
             lblHora.Text = DateTime.Now.ToLongTimeString();
         }
 
+        private void cargaDatosNFC()
+        {
+            Configuracion.clsConfiguracion.getDatos();
+            lblNombreGimnacio.Text = Configuracion.clsConfiguracion.datos.NombreGimnacio.ToUpper();
+            lblDomicilio.Text = Configuracion.clsConfiguracion.datos.Domicilio;
+            lblTelefono.Text = Configuracion.clsConfiguracion.datos.Telefono;
+            lblRFC.Text = Configuracion.clsConfiguracion.datos.RFC.ToUpper();
+            lblMensaje.Text = Configuracion.clsConfiguracion.datos.Mensaje;
+            if (Configuracion.clsConfiguracion.datos.Logo != null)
+            {
+
+                MemoryStream stream = new MemoryStream(Configuracion.clsConfiguracion.datos.Logo);
+                Bitmap image = new Bitmap(stream);
+                pbLogo.Image = image;
+            }
+
+            lblFecha.Text = DateTime.Now.ToLongDateString();
+            lblHora.Text = DateTime.Now.ToLongTimeString();
+
+            object sender = new object();
+            KeyEventArgs a = new KeyEventArgs(Keys.Enter);
+            txtClave_KeyDown(sender, a);
+        }
+
         private void textBox1_KeyDown(object sender, KeyEventArgs e)
         {
            
@@ -61,15 +102,27 @@ namespace Gimnasio.Registro
         {
             if (e.KeyCode == Keys.Enter)
             {
-               
+                int clave;
 
-                if (!ExpresionesRegulares.RegEX.isNumber(txtClave.Text.ToString()))
+                if (!string.IsNullOrEmpty(sourceTrigger) && sourceTrigger == "RegistroNFC")
                 {
-                    MessageBox.Show("La clave es numerica, debes introducir solo numeros");
-                    return;
+                    //TODO: Comprobar si sigue el patron que nos gustaria para usuarios especiales. 
+                    //if (!ExpresionesRegulares.RegEX.isNumber(idUsuario))
+                    //{
+                    //    MessageBox.Show("La clave es numerica, debes introducir solo numeros");
+                    //    return;
+                    //}
+                    clave = int.Parse(idUsuario);
                 }
-
-                int clave = int.Parse(txtClave.Text.ToString());
+                else
+                {
+                    if (!ExpresionesRegulares.RegEX.isNumber(txtClave.Text.ToString()))
+                    {
+                        MessageBox.Show("La clave es numerica, debes introducir solo numeros");
+                        return;
+                    }
+                    clave = int.Parse(txtClave.Text.ToString());
+                }
 
                 oRegistro = new clsRegistro(clave);
                 if (oRegistro.buscaDatos())
@@ -79,6 +132,7 @@ namespace Gimnasio.Registro
                     txtPaterno.Text = oRegistro.datos.Paterno;
                     txtMaterno.Text = oRegistro.datos.Materno;
                     lblVencimiento.Text = oRegistro.datos.Vencimiento.ToLongDateString();
+                   
                     //cargar foto
                     if (oRegistro.datos.foto != null)
                     {
@@ -87,7 +141,15 @@ namespace Gimnasio.Registro
                         pbFoto.Image = image;
                     }
 
-                    txtClave.Text = "";
+                    if (!string.IsNullOrEmpty(sourceTrigger) && sourceTrigger == "RegistroNFC")
+                    {
+                        txtClave.Text = Convert.ToString(clave);
+                    }
+                    else
+                    {
+                        txtClave.Text = "";
+                    }
+                      
                     if (DateTime.Compare(oRegistro.datos.Vencimiento, DateTime.Now) < 0)
                     {
                         lblVencimiento.ForeColor = Color.Red;

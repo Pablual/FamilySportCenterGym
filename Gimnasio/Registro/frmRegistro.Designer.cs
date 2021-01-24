@@ -26,7 +26,7 @@
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent()
+        private void InitializeComponent(string source = null)
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmRegistro));
@@ -327,7 +327,14 @@
             this.MinimizeBox = false;
             this.Name = "frmRegistro";
             this.Text = "Registro";
-            this.Load += new System.EventHandler(this.frmRegistro_Load);
+            if (!string.IsNullOrEmpty(source) && source == "RegistroNFC")
+            {
+                this.Load += new System.EventHandler(this.frmRegistro_LoadNFC);
+            }
+            else
+            {
+                this.Load += new System.EventHandler(this.frmRegistro_Load);
+            }
             this.SizeChanged += new System.EventHandler(this.frmRegistro_SizeChanged);
             this.panelEncabezado.ResumeLayout(false);
             this.panelEncabezado.PerformLayout();
