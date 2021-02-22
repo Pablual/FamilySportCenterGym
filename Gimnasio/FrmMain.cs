@@ -15,13 +15,14 @@ using System.IO;
 using System.Net.Sockets;
 using Gimnasio.Socios;
 using Gimnasio.Utilidades;
+using Gimnasio.Utilidades.Model;
 
 namespace Gimnasio
 {
     public partial class FrmMain : Form
     {
         Registro.frmRegistro frmMNFC;
-        System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
+        System.Windows.Forms.Timer myTimer = new System.Windows.Forms.Timer();
         public FrmMain()
         {
             InitializeComponent();
@@ -30,19 +31,6 @@ namespace Gimnasio
         private void Form1_Load(object sender, EventArgs e)
         {
             this.WindowState = FormWindowState.Maximized;
-
-            //mensaje inicio, puedes quitar esta linea, pero este software lo hizo Héctor de León Guevara | www.hdeleon.net
-            try
-            {
-                if (!System.IO.File.Exists(AppDomain.CurrentDomain.BaseDirectory + "/hdeleon.txt"))
-                {
-                    FrmMensajeInicial frmMensaje = new FrmMensajeInicial();
-                    frmMensaje.ShowDialog();
-
-                    System.IO.File.Create(AppDomain.CurrentDomain.BaseDirectory + "/hdeleon.txt");
-                }
-            }
-            catch { }
 
             sinSesion();
 
@@ -85,43 +73,41 @@ namespace Gimnasio
                     this.Invoke(new MethodInvoker(delegate ()
                     {
                         //Variables de comprobación
-                        bool comprobarSocio = false;
-
+                        SocioModel currentSocio;
                         clsSistemaApertura torno = new clsSistemaApertura();
-                        comprobarSocio = torno.comprobarSocio(idUsuario);
 
-                        if (comprobarSocio == true)
+                        //Comprobamos si el idUsuario es un numero
+                        if ( !string.IsNullOrEmpty(idUsuario) && ExpresionesRegulares.RegEX.isNumber(idUsuario))
                         {
-                            if (!detectarFormularioAbierto("frmRegistro"))
+                            currentSocio = torno.comprobarSocio(idUsuario);
+
+                            if (currentSocio.isSocioEnabled == true)
                             {
-                                frmMNFC = new Registro.frmRegistro("RegistroNFC", idUsuario);
-                                frmMNFC.ShowDialog();
-                                frmMNFC.WindowState = FormWindowState.Normal;
+                                if (!detectarFormularioAbierto("frmRegistro"))
+                                {
+                                    frmMNFC = new Registro.frmRegistro("RegistroNFC", idUsuario);
+                                    frmMNFC.Show();
+                                    frmMNFC.WindowState = FormWindowState.Minimized;
+
+                                    myTimer.Tick += new EventHandler(TimerEvent);
+                                    myTimer.Interval = 5000;
+                                    myTimer.Start();
+
+                                }
+                                //TODO poner el boton del torno en verde y en rojo cuando se cierre con la respuesta de arduino
+                                torno.abrir(currentSocio);
                             }
-                            torno.abrir();
-                            //System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
-                            //timer.Tick += new EventHandler(timerEvent);
-                            //timer.Interval = 5000;
-                            //timer.Start();
+                            else
+                            {
+                                MessageBox.Show("El socio no tiene permiso para entrar al gimnasio, por favor revise la membresia");
+                                return;
+                            }
                         }
                         else
                         {
-                            if (!detectarFormularioAbierto("frmRegistro"))
-                            {
-                                frmMNFC = new Registro.frmRegistro("RegistroNFC", idUsuario);
-                                frmMNFC.Show();
-                                frmMNFC.WindowState = FormWindowState.Normal;
-                            }
-                            
-                            //timer.Tick += new EventHandler(timerEvent);
-                            //timer.Interval = 5000;
-                            //timer.Start();
+                            MessageBox.Show("La clave es numerica, debes introducir solo numeros");
+                            return;
                         }
-                       
-                        //Código para escribir en el textbox los datos del usuario
-                        //listBox_received.Items.Add(RemoteIpEndPoint.Address.ToString() + ": Membresia(" + membresia + "), Vencimiento(" + fechaVencimiento + ")");
-                        //listBox_received.SelectedIndex = listBox_received.Items.Count - 1;
-                        //listBox_received.SelectedIndex = -1;
                     }));
                 }
             }
@@ -162,10 +148,11 @@ namespace Gimnasio
 
         #region METODOS PRIVADOS
 
-        private void timerEvent(Object myObject, EventArgs myEventArgs)
+        private void TimerEvent(Object myObject, EventArgs myEventArgs)
         {
             frmMNFC.Close();
-            timer.Stop();
+            myTimer.Stop();
+           // myTimer.Enabled = true;
         }
 
         private bool detectarFormularioAbierto(string formulario)

@@ -1,4 +1,5 @@
 ﻿using Gimnasio.Socios;
+using Gimnasio.Utilidades.Model;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -7,95 +8,166 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Windows.Forms;
+using static Gimnasio.Utilidades.Model.SocioModel;
 
 namespace Gimnasio.Utilidades
 {
     public class clsSistemaApertura
     {
 
-        public bool comprobarSocio(string returnData)
+        public SocioModel comprobarSocio(string idUsuario)
         {
             #region Variables
-            bool result = false;
-            int idSocio = Convert.ToInt32(returnData);
+            int idSocio = Convert.ToInt32(idUsuario);
             DateTime fecha = DateTime.Now;
+            SocioModel currentSocio = new SocioModel();
 
             clsSocioMembresia infoMembresiaSocio = new clsSocioMembresia();
             Socios.clsSocio oSocio = new Socios.clsSocio();
 
-            DataGridView dgvListaInfo = new DataGridView();
+            DataGridView dgvListaInfoMembresia = new DataGridView();
             DataGridView dgvListaRegistro = new DataGridView();
-
-            string membresia = string.Empty;
-            DateTime fechaVencimiento = DateTime.Now;
+            DataTable tablaRegistro = new DataTable();
             #endregion
 
             #region Get Datos
-            //Recoger datos
-            if (infoMembresiaSocio.getDatos(dgvListaInfo, idSocio))
+            //Recoger datos del socio
+            if (oSocio.getDatos(Convert.ToInt32(idSocio)))
             {
-                DataTable dataSource = (DataTable)dgvListaInfo.DataSource;
-                DataRow dataRow = dataSource.Rows[0];
-                membresia = dataRow["Membresia"].ToString();
-                fechaVencimiento = Convert.ToDateTime(dataRow["Vencimiento"]);
-            }
-            else
-            {
-               MessageBox.Show(infoMembresiaSocio.getError());
-            }
-
-            //recoger datos registro
-            if (oSocio.getDatosRptRegistro(dgvListaRegistro, fecha))
-            {
-                DataTable dataSource = (DataTable)dgvListaRegistro.DataSource;
-                for (int i = 0; i < dataSource.Rows.Count; i++)
+                if (string.IsNullOrEmpty(oSocio.datos.Nombre))
                 {
-                    var a = dataSource.Rows[i];
+                    MessageBox.Show("El nombre del socio esta vacio");
+                    currentSocio.isSocioEnabled = false;
+                    return currentSocio;
                 }
-                DataRow dataRow = dataSource.Rows[0];
-                //TODO procesar los datos de registro comprobando si el usuario ha entrado en el dia de hoy mas de dos veces
+                if (string.IsNullOrEmpty(oSocio.datos.Paterno))
+                {
+                    MessageBox.Show("El nombrePaterno del socio esta vacio");
+                    currentSocio.isSocioEnabled = false;
+                    return currentSocio;
+                }
+                if (string.IsNullOrEmpty(oSocio.datos.Materno))
+                {
+                    MessageBox.Show("El nombreMaterno del socio esta vacio");
+                    currentSocio.isSocioEnabled = false;
+                    return currentSocio;
+                }
+                currentSocio.idSocio = Convert.ToString(idSocio);
+                currentSocio.nombre = oSocio.datos.Nombre;
+                currentSocio.nombrePaterno = oSocio.datos.Paterno;
+                currentSocio.nombreMaterno = oSocio.datos.Materno;
             }
             else
             {
                 MessageBox.Show(oSocio.getError());
+                currentSocio.isSocioEnabled = false;
+                return currentSocio;
             }
-            #endregion
-
-            if (comprobarSociosAdministradores(membresia))
+            //Recoger datos de la membresia del socio
+            if (infoMembresiaSocio.getDatos(dgvListaInfoMembresia, idSocio))
             {
-                result = true;
-            }
-            else if (comprobarFechaVencimiento(fechaVencimiento))
-            {
-                //TODO: Comprobar bono solo mañana
-                if (comprobarMembresia(membresia))
+                DataTable dataSource = (DataTable)dgvListaInfoMembresia.DataSource;
+                string membresia = string.Empty;
+                string fechaVencimiento = string.Empty;
+                if (dataSource.Rows.Count != 0)
                 {
-                    if (comprobarRegistroDiario())
-                    {
-                        result = true;
-                    }
-                    else
-                    {
-                        //TODO: Mostrar al usuario que el socio ya ha completado los registros diarios posibles.
-                        result = false;
-                    }
+                    DataRow dataRow = dataSource.Rows[0];
+                    membresia = dataRow["Membresia"].ToString();
+                    fechaVencimiento = dataRow["Vencimiento"].ToString();
                 }
                 else
                 {
-                    //TODO: Mostrar al usuario que el socio tiene bono de mañanas y no puede entrar de tardes
-                    result = false;
+                    MessageBox.Show("El socio " + idSocio + " no tiene membresia, por favor añada una membresia válida");
+                    currentSocio.isSocioEnabled = false;
+                    return currentSocio;
+                }
+
+                if (!string.IsNullOrEmpty(membresia))
+                {
+                    currentSocio.membresia = (MembresiaType)Enum.Parse(typeof(MembresiaType), membresia);
+                }
+                else
+                {
+                    MessageBox.Show("El socio " + idSocio + " no tiene membresia, por favor añada una membresia válida");
+                    currentSocio.isSocioEnabled = false;
+                    return currentSocio;
+                }
+
+                if (!string.IsNullOrEmpty(fechaVencimiento))
+                {
+                    currentSocio.vencimiento = Convert.ToDateTime(fechaVencimiento);
+                }
+                else
+                {
+                    MessageBox.Show("El socio " + idSocio + " no tiene fecha de vencimiento");
+                    currentSocio.isSocioEnabled = false;
+                    return currentSocio;
                 }
             }
             else
             {
-                result = false;
+                MessageBox.Show(infoMembresiaSocio.getError());
+                currentSocio.isSocioEnabled = false;
+                return currentSocio;
             }
-            return result;
+            //Recoger datos del registro del socio
+            if (oSocio.getDatosRptRegistro(dgvListaRegistro, fecha))
+            {
+                tablaRegistro = (DataTable)dgvListaRegistro.DataSource;
+            }
+            else
+            {
+                MessageBox.Show(oSocio.getError());
+                currentSocio.isSocioEnabled = false;
+                return currentSocio;
+            }
+            #endregion
+            if (comprobarSociosAdministradores(currentSocio))
+            {
+                currentSocio.isSocioEnabled = true;
+                currentSocio.exitType = "BOTH";
+            }
+            else if (comprobarMembresiaVisitaSocios(currentSocio))
+            {
+                if (comprobarRegistroDiario(tablaRegistro, ref currentSocio))
+                {
+                    currentSocio.isSocioEnabled = true;
+                }
+                else
+                {
+                    currentSocio.isSocioEnabled = false;
+                    MessageBox.Show("El socio ya ha completado todos los registros diarios del gimnasio");
+                }
+            }
+            else if (comprobarFechaVencimiento(currentSocio))
+            {
+                if (comprobarMembresia(currentSocio))
+                {
+                    if (comprobarRegistroDiario(tablaRegistro, ref currentSocio))
+                    {
+                        currentSocio.isSocioEnabled = true;
+                    }
+                    else
+                    {
+                        currentSocio.isSocioEnabled = false;
+                        MessageBox.Show("El socio ya ha completado todos los registros diarios del gimnasio");
+                    }
+                }
+                else
+                {
+                    currentSocio.isSocioEnabled = false;
+                    MessageBox.Show("El socio " + currentSocio.idSocio + " tiene bono de mañanas y no puede entrar al gimnasio a partir de las 14");
+                }
+            }
+            else
+            {
+                currentSocio.isSocioEnabled = false;
+            }
+            return currentSocio;
         }
 
-        public bool abrir()
+        public bool abrir(SocioModel currentSocio)
         {   //TODO: Configurar la ip y el puerto donde queremos enviar el mensaje
-            //TODO: Configurar el mensaje que queremos enviar
             try
             {
                 #region TCP
@@ -119,17 +191,15 @@ namespace Gimnasio.Utilidades
                 #endregion
 
                 #region UPD
-                //long ip = 1921680102;
-                //IPAddress ip = new IPAddress(ip);
-                //string port = "8080";
-                //string mensaje = "LFT";
+                string ipAddress = "192.168.1.102";
+                IPAddress ip = IPAddress.Parse(ipAddress);
+                string port = "8080";
+                string mensaje = currentSocio.exitType;
 
-                //UdpClient udpClient = new UdpClient();
-                //udpClient.Connect(ip, Convert.ToInt16(port));
-                //Byte[] senddata = Encoding.ASCII.GetBytes(mensaje);
-                //udpClient.Send(senddata, senddata.Length);
-
-                MessageBox.Show("Puerta Abierta");
+                UdpClient udpClient = new UdpClient();
+                udpClient.Connect(ip, Convert.ToInt16(port));
+                Byte[] senddata = Encoding.ASCII.GetBytes(mensaje);
+                udpClient.Send(senddata, senddata.Length);
                 #endregion
             }
             catch (Exception ex)
@@ -141,33 +211,43 @@ namespace Gimnasio.Utilidades
 
 
         #region Private methods 
-        private bool comprobarSociosAdministradores(string membresia)
+
+        private bool comprobarMembresiaVisitaSocios(SocioModel socio)
         {
             bool result = false;
-            if (!string.IsNullOrEmpty(membresia))
+
+            if (socio.membresia == MembresiaType.Visita)
             {
-                if (membresia.ToLower() == "infinito")
-                {
-                    result = true;
-                }
-                else
-                {
-                    result = false;
-                }
+                result = true;
             }
             else
             {
-                //TODO: Completar el error: el usuario no tiene membresia
-                //MessageBox.Show(infoMembresiaSocio.getError());
+                result = false;
             }
+
             return result;
         }
-
-        private bool comprobarFechaVencimiento(DateTime fechaVencimiento)
+        private bool comprobarSociosAdministradores(SocioModel socio)
         {
             bool result = false;
 
-            int relation = DateTime.Compare(fechaVencimiento, DateTime.Now);
+            if (socio.membresia == MembresiaType.Infinito)
+            {
+                result = true;
+            }
+            else
+            {
+                result = false;
+            }
+
+            return result;
+        }
+
+        private bool comprobarFechaVencimiento(SocioModel socio)
+        {
+            bool result = false;
+
+            int relation = DateTime.Compare(socio.vencimiento, DateTime.Now);
             if (relation > 0)
             {
                 result = true;
@@ -184,47 +264,111 @@ namespace Gimnasio.Utilidades
             return result;
         }
 
-        private bool comprobarMembresia(string membresia)
+        private bool comprobarMembresia(SocioModel socio)
         {
             bool result = false;
 
-            if (!string.IsNullOrEmpty(membresia))
+            if (socio.membresia == MembresiaType.MedioDia)
             {
-                if (membresia.ToLower() == "mañana")
-                {
-                    //TODO: Completar lógica solo mañana
-                    int  hora = DateTime.Now.Hour;
-                    int min = DateTime.Now.Minute;
-                    int sec = DateTime.Now.Minute;
+                int day = DateTime.Now.Day;
+                int month = DateTime.Now.Month;
+                int year = DateTime.Now.Year;
 
+                DateTime currentTime = DateTime.Now;
+                DateTime horaLimiteManana = new DateTime(year, month, day, 13, 59, 59);
+                int output = DateTime.Compare(currentTime, horaLimiteManana);
+
+                if (output < 0)
+                {
                     result = true;
-                    //result = false;
+                }
+                else if (output == 0)
+                {
+                    result = true;
                 }
                 else
                 {
-                    result = true;
+                    result = false;
                 }
             }
             else
             {
-                //TODO: Completar el error: el usuario no tiene membresia
-                //MessageBox.Show(infoMembresiaSocio.getError());
+                result = true;
             }
+
             return result;
         }
 
-        private bool comprobarRegistroDiario()
+        private bool comprobarRegistroDiario(DataTable dataSource, ref SocioModel socio)
         {
+            bool result = false;
+            int contadorRegistroUsuario = 0;
+            string registroNombre = string.Empty;
+            string registroNombrePaterno = string.Empty;
+            string regsitroNombreMaterno = string.Empty;
 
-            //if (!ExpresionesRegulares.RegEX.isNumber(txtClave.Text.ToString()))
-            //{
-            //    MessageBox.Show("La clave es numerica, debes introducir solo numeros");
-            //    return;
-            //}
-           
-           
-            //TODO: Recoger datos registro
-            return true;
+            for (int i = 0; i < dataSource.Rows.Count; i++)
+            {
+                DataRow registro = dataSource.Rows[i];
+                registroNombre = registro["Nombre"].ToString().ToLower();
+                registroNombrePaterno = registro["Paterno"].ToString().ToLower();
+                regsitroNombreMaterno = registro["Materno"].ToString().ToLower();
+
+                if (registroNombre == socio.nombre.ToLower() && registroNombrePaterno == socio.nombrePaterno.ToLower() && regsitroNombreMaterno == socio.nombreMaterno.ToLower())
+                {
+                    contadorRegistroUsuario += 1;
+                }
+            }
+
+            if (socio.membresia == MembresiaType.AnualPlus || socio.membresia == MembresiaType.TrimestralPlus || socio.membresia == MembresiaType.MensualPlus || socio.membresia == MembresiaType.MedioDiaPlus)
+            {
+                switch (contadorRegistroUsuario)
+                {
+                    case 0:
+                        //EntradaGYM
+                        socio.exitType = "LFT";
+                        result = true;
+                        break;
+                    case 1:
+                        //SalidaGYM
+                        socio.exitType = "RGT";
+                        result = true;
+                        break;
+                    case 2:
+                        //EntradaGYM
+                        socio.exitType = "LFT";
+                        result = true;
+                        break;
+                    case 3:
+                        //SalidaGYM
+                        socio.exitType = "RGT";
+                        result = true;
+                        break;
+                    default:
+                        result = false;
+                        break;
+                }
+            }
+            else
+            {
+                switch (contadorRegistroUsuario)
+                {
+                    case 0:
+                        //EntradaGYM
+                        socio.exitType = "LEFT";
+                        result = true;
+                        break;
+                    case 1:
+                        //SalidaGYM
+                        socio.exitType = "RGT";
+                        result = true;
+                        break;
+                    default:
+                        result = false;
+                        break;
+                }
+            }
+            return result;
         }
         #endregion
     }

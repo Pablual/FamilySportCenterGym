@@ -242,8 +242,6 @@ D:\PersonalProjects\Gimnasio\obj\x86\Debug\Gimnasio.Usuarios.frmUsuarios.resourc
 D:\PersonalProjects\Gimnasio\obj\x86\Debug\Gimnasio.Utilidades.frmPadre.resources
 D:\PersonalProjects\Gimnasio\obj\x86\Debug\Gimnasio.csproj.GenerateResource.cache
 D:\PersonalProjects\Gimnasio\obj\x86\Debug\Gimnasio.csproj.CoreCompileInputs.cache
-D:\PersonalProjects\Gimnasio\obj\x86\Debug\Gimnasio.exe
-D:\PersonalProjects\Gimnasio\obj\x86\Debug\Gimnasio.pdb
 D:\PersonalProjects\Gimnasio\bin\Debug\Gimnasio.exe.config
 D:\PersonalProjects\Gimnasio\bin\Debug\Gimnasio.exe
 D:\PersonalProjects\Gimnasio\bin\Debug\Gimnasio.pdb
@@ -253,3 +251,5 @@ D:\PersonalProjects\Gimnasio\bin\Debug\MySql.Data.dll
 D:\PersonalProjects\Gimnasio\bin\Debug\MySqlBackup.dll
 D:\PersonalProjects\Gimnasio\bin\Debug\RegEX.dll
 D:\PersonalProjects\Gimnasio\obj\x86\Debug\Gimnasio.csproj.CopyComplete
+D:\PersonalProjects\Gimnasio\obj\x86\Debug\Gimnasio.exe
+D:\PersonalProjects\Gimnasio\obj\x86\Debug\Gimnasio.pdb

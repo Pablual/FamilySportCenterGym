@@ -106,12 +106,11 @@ namespace Gimnasio.Registro
 
                 if (!string.IsNullOrEmpty(sourceTrigger) && sourceTrigger == "RegistroNFC")
                 {
-                    //TODO: Comprobar si sigue el patron que nos gustaria para usuarios especiales. 
-                    //if (!ExpresionesRegulares.RegEX.isNumber(idUsuario))
-                    //{
-                    //    MessageBox.Show("La clave es numerica, debes introducir solo numeros");
-                    //    return;
-                    //}
+                    if (!ExpresionesRegulares.RegEX.isNumber(idUsuario))
+                    {
+                        MessageBox.Show("La clave es numerica, debes introducir solo numeros");
+                        return;
+                    }
                     clave = int.Parse(idUsuario);
                 }
                 else

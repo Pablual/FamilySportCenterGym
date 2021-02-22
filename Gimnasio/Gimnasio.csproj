@@ -254,6 +254,7 @@
     <Compile Include="Utilidades\frmPadre.Designer.cs">
       <DependentUpon>frmPadre.cs</DependentUpon>
     </Compile>
+    <Compile Include="Utilidades\Model\SocioModel.cs" />
     <Compile Include="Utilidades\OperacionesFormulario.cs" />
     <EmbeddedResource Include="Configuracion\frmConfiguracion.resx">
       <DependentUpon>frmConfiguracion.cs</DependentUpon>
