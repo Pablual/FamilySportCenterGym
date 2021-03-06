@@ -14,6 +14,7 @@ namespace Gimnasio.Utilidades
 {
     public class clsSistemaApertura
     {
+        public clsSistemaApertura() { }
 
         public SocioModel comprobarSocio(string idUsuario)
         {
@@ -125,7 +126,7 @@ namespace Gimnasio.Utilidades
             if (comprobarSociosAdministradores(currentSocio))
             {
                 currentSocio.isSocioEnabled = true;
-                currentSocio.exitType = "BOTH";
+                currentSocio.exitType = "BTH";
             }
             else if (comprobarMembresiaVisitaSocios(currentSocio))
             {
@@ -136,7 +137,12 @@ namespace Gimnasio.Utilidades
                 else
                 {
                     currentSocio.isSocioEnabled = false;
-                    MessageBox.Show("El socio ya ha completado todos los registros diarios del gimnasio");
+                    DialogResult result = MessageBox.Show("El socio ya ha completado todos los registros diarios del gimnasio");
+                    if (result == DialogResult.OK)
+                    {
+                        currentSocio.exitType = "NON";
+                        enviar(currentSocio);
+                    }
                 }
             }
             else if (comprobarFechaVencimiento(currentSocio))
@@ -150,13 +156,23 @@ namespace Gimnasio.Utilidades
                     else
                     {
                         currentSocio.isSocioEnabled = false;
-                        MessageBox.Show("El socio ya ha completado todos los registros diarios del gimnasio");
+                        DialogResult result = MessageBox.Show("El socio ya ha completado todos los registros diarios del gimnasio");
+                        if (result == DialogResult.OK)
+                        {
+                            currentSocio.exitType = "NON";
+                            enviar(currentSocio);
+                        }
                     }
                 }
                 else
                 {
                     currentSocio.isSocioEnabled = false;
-                    MessageBox.Show("El socio " + currentSocio.idSocio + " tiene bono de mañanas y no puede entrar al gimnasio a partir de las 14");
+                    DialogResult result = MessageBox.Show("El socio " + currentSocio.idSocio + " tiene bono de mañanas y no puede entrar al gimnasio a partir de las 14");
+                    if (result == DialogResult.OK)
+                    {
+                        currentSocio.exitType = "NON";
+                        enviar(currentSocio);
+                    }
                 }
             }
             else
@@ -166,7 +182,7 @@ namespace Gimnasio.Utilidades
             return currentSocio;
         }
 
-        public bool abrir(SocioModel currentSocio)
+        public bool enviar(SocioModel currentSocio)
         {   //TODO: Configurar la ip y el puerto donde queremos enviar el mensaje
             try
             {
@@ -355,7 +371,7 @@ namespace Gimnasio.Utilidades
                 {
                     case 0:
                         //EntradaGYM
-                        socio.exitType = "LEFT";
+                        socio.exitType = "LFT";
                         result = true;
                         break;
                     case 1:

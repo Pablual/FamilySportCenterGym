@@ -95,11 +95,10 @@ namespace Gimnasio
 
                                 }
                                 //TODO poner el boton del torno en verde y en rojo cuando se cierre con la respuesta de arduino
-                                torno.abrir(currentSocio);
+                                torno.enviar(currentSocio);
                             }
                             else
                             {
-                                MessageBox.Show("El socio no tiene permiso para entrar al gimnasio, por favor revise la membresia");
                                 return;
                             }
                         }
@@ -310,38 +309,10 @@ namespace Gimnasio
         {
             try
             {
-                #region TCP
-                //string requestUrl = "http://192.168.0.36/";
-                //WebRequest request = HttpWebRequest.Create(requestUrl);
-                //request.Method = "POST";
-                //request.ContentType = "application/x-www-form-urlencoded";
-                //string postData = "myparam1=myvalue1&myparam2=myvalue2";
-                //using (var writer = new StreamWriter(request.GetRequestStream()))
-                //{
-                //    writer.Write(postData);
-                //}
-                //string responseFromRemoteServer;
-                //using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-                //{
-                //    using (StreamReader reader = new StreamReader(response.GetResponseStream()))
-                //    {
-                //        responseFromRemoteServer = reader.ReadToEnd();
-                //    }
-                //}
-                #endregion
-
-                #region UPD
-                IPAddress ip = new IPAddress(Convert.ToByte("192.168.0.102"));
-                string port = "8080";
-                string mensaje = "LFT";
-
-                UdpClient udpClient = new UdpClient();
-                udpClient.Connect(ip, Convert.ToInt16(port));
-                Byte[] senddata = Encoding.ASCII.GetBytes(mensaje);
-                udpClient.Send(senddata, senddata.Length);
-
-                MessageBox.Show("Puerta Abierta");
-                #endregion
+                    SocioModel currentSocio = new SocioModel();
+                    clsSistemaApertura sitemaApertura = new clsSistemaApertura();
+                    currentSocio.exitType = "NON";
+                    sitemaApertura.enviar(currentSocio);
             }
             catch (Exception ex)
             {

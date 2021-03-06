@@ -7,6 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
+using Gimnasio.Utilidades.Model;
+using Gimnasio.Utilidades;
+
 namespace Gimnasio.Registro
 {
     public partial class frmRegistro : Form
@@ -108,7 +111,15 @@ namespace Gimnasio.Registro
                 {
                     if (!ExpresionesRegulares.RegEX.isNumber(idUsuario))
                     {
-                        MessageBox.Show("La clave es numerica, debes introducir solo numeros");
+                        DialogResult result = MessageBox.Show("La clave es numerica, debes introducir solo numeros");
+                        if (result == DialogResult.OK)
+                        {
+                            SocioModel currentSocio = new SocioModel();
+                            clsSistemaApertura sitemaApertura = new clsSistemaApertura();
+                            currentSocio.idSocio = idUsuario;
+                            currentSocio.exitType = "NON";
+                            sitemaApertura.enviar(currentSocio);
+                        }
                         return;
                     }
                     clave = int.Parse(idUsuario);
@@ -152,8 +163,15 @@ namespace Gimnasio.Registro
                     if (DateTime.Compare(oRegistro.datos.Vencimiento, DateTime.Now) < 0)
                     {
                         lblVencimiento.ForeColor = Color.Red;
-                        MessageBox.Show("Se a términado tu membresia");
-
+                        DialogResult result = MessageBox.Show("Se a términado tu membresia");
+                        if (result == DialogResult.OK)
+                        {
+                            SocioModel currentSocio = new SocioModel();
+                            clsSistemaApertura sitemaApertura = new clsSistemaApertura();
+                            currentSocio.idSocio = idUsuario;
+                            currentSocio.exitType = "NON";
+                            sitemaApertura.enviar(currentSocio);
+                        }
                     }
                     //si no se a venciudo la registramos REGISTRO
                     else
@@ -168,7 +186,7 @@ namespace Gimnasio.Registro
                             TimeSpan ts = newDate - oldDate;
                             int diasFaltantes=ts.Days;
 
-                            MessageBox.Show("Quedan "+(diasFaltantes)+" dias de tu membresia");
+                            //MessageBox.Show("Quedan "+(diasFaltantes)+" dias de tu membresia");
                         }
 
                         lblVencimiento.ForeColor = Color.Black;
@@ -181,7 +199,15 @@ namespace Gimnasio.Registro
                 }
                 else
                 {
-                    MessageBox.Show("No existe un socio con esa clave");
+                    DialogResult result = MessageBox.Show("No existe un socio con esa clave");
+                    if (result == DialogResult.OK)
+                    {
+                        SocioModel currentSocio = new SocioModel();
+                        clsSistemaApertura sitemaApertura = new clsSistemaApertura();
+                        currentSocio.idSocio = idUsuario;
+                        currentSocio.exitType = "NON";
+                        sitemaApertura.enviar(currentSocio);
+                    }
                 }
             }
         }

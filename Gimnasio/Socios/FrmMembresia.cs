@@ -7,10 +7,12 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
+
 namespace Gimnasio.Socios
 {
     public partial class FrmMembresia : Form
     {
+        System.IO.Ports.SerialPort ArduinoPort;
         public int id = 0;
         clsSocio oSocio = new clsSocio();
         Membresias.clsMembresia oMembresia = new Membresias.clsMembresia();
@@ -27,6 +29,7 @@ namespace Gimnasio.Socios
                 lblNombre.Text = oSocio.datos.Nombre + " " + oSocio.datos.Paterno + " " + oSocio.datos.Materno;
                 lblTelefono.Text = oSocio.datos.Telefono;
                 txtObservaciones.Text = oSocio.datos.Observaciones;
+                label10.Text = id.ToString();
 
                 if (oSocio.datos.foto != null)
                 {
@@ -161,6 +164,19 @@ namespace Gimnasio.Socios
             {
                 MessageBox.Show("No existen membresias para ser eliminadas");
             }
+        }
+
+        private void button3_Click(object sender, EventArgs e, string Id)
+        {
+            //Perder el foco
+            //crear Serial Port
+            ArduinoPort = new System.IO.Ports.SerialPort();
+            ArduinoPort.PortName = "COM4";  //sustituir por vuestro 
+            ArduinoPort.BaudRate = 9600;
+            ArduinoPort.Open();
+            ArduinoPort.Write(Id);
+            if (ArduinoPort.IsOpen) ArduinoPort.Close();
+            refrescaLista();
         }
     }
 }
