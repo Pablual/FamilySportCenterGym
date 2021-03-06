@@ -123,6 +123,7 @@ namespace Gimnasio.Utilidades
                 return currentSocio;
             }
             #endregion
+
             if (comprobarSociosAdministradores(currentSocio))
             {
                 currentSocio.isSocioEnabled = true;

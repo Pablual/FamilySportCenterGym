@@ -68,7 +68,8 @@ namespace Gimnasio
                 {
                     IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
                     byte[] bytes = listener.Receive(ref RemoteIpEndPoint);
-                    string idUsuario = Encoding.ASCII.GetString(bytes, 0, bytes.Length);
+                    string idUsuarioConvert = Encoding.ASCII.GetString(bytes, 0, bytes.Length);
+                    string idUsuario = ConvertHex(idUsuarioConvert);
 
                     this.Invoke(new MethodInvoker(delegate ()
                     {
@@ -87,7 +88,7 @@ namespace Gimnasio
                                 {
                                     frmMNFC = new Registro.frmRegistro("RegistroNFC", idUsuario);
                                     frmMNFC.Show();
-                                    frmMNFC.WindowState = FormWindowState.Minimized;
+                                    frmMNFC.WindowState = FormWindowState.Maximized;
 
                                     myTimer.Tick += new EventHandler(TimerEvent);
                                     myTimer.Interval = 5000;
@@ -104,6 +105,10 @@ namespace Gimnasio
                         }
                         else
                         {
+                            clsSistemaApertura cls = new clsSistemaApertura();
+                            SocioModel currentSocioError = new SocioModel();
+                            currentSocioError.exitType = "NON";
+                            cls.enviar(currentSocioError);
                             MessageBox.Show("La clave es numerica, debes introducir solo numeros");
                             return;
                         }
@@ -119,6 +124,29 @@ namespace Gimnasio
                 listener.Close();
             }
 
+        }
+        public static string ConvertHex(String hexString)
+        {
+            try
+            {
+                string ascii = string.Empty;
+
+                for (int i = 0; i < hexString.Length; i += 2)
+                {
+                    String hs = string.Empty;
+
+                    hs = hexString.Substring(i, 2);
+                    uint decval = System.Convert.ToUInt32(hs, 16);
+                    char character = System.Convert.ToChar(decval);
+                    ascii += character;
+
+                }
+
+                return ascii;
+            }
+            catch (Exception ex) { Console.WriteLine(ex.Message); }
+
+            return string.Empty;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -311,7 +339,7 @@ namespace Gimnasio
             {
                     SocioModel currentSocio = new SocioModel();
                     clsSistemaApertura sitemaApertura = new clsSistemaApertura();
-                    currentSocio.exitType = "NON";
+                    currentSocio.exitType = "BTH";
                     sitemaApertura.enviar(currentSocio);
             }
             catch (Exception ex)
