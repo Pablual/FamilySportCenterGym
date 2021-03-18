@@ -163,7 +163,7 @@ namespace Gimnasio.Registro
                     if (DateTime.Compare(oRegistro.datos.Vencimiento, DateTime.Now) < 0)
                     {
                         lblVencimiento.ForeColor = Color.Red;
-                        DialogResult result = MessageBox.Show("Se a términado tu membresia");
+                        DialogResult result = MessageBox.Show("Se ha términado tu membresia");
                         if (result == DialogResult.OK)
                         {
                             SocioModel currentSocio = new SocioModel();

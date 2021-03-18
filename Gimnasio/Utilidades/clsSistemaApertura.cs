@@ -124,7 +124,12 @@ namespace Gimnasio.Utilidades
             }
             #endregion
 
-            if (comprobarSociosAdministradores(currentSocio))
+            if (comprobarTarjetaMaestra(currentSocio))
+            {
+                currentSocio.isSocioEnabled = true;
+                currentSocio.exitType = "BTH";
+            }
+            else if (comprobarSociosAdministradores(currentSocio))
             {
                 currentSocio.isSocioEnabled = true;
                 currentSocio.exitType = "BTH";
@@ -168,7 +173,7 @@ namespace Gimnasio.Utilidades
                 else
                 {
                     currentSocio.isSocioEnabled = false;
-                    DialogResult result = MessageBox.Show("El socio " + currentSocio.idSocio + " tiene bono de mañanas y no puede entrar al gimnasio a partir de las 14");
+                    DialogResult result = MessageBox.Show("El socio " + currentSocio.idSocio + " tiene bono de medio dia. No puede entrar al gimnasio a partir de las 13 y debe salir antes de la misma");
                     if (result == DialogResult.OK)
                     {
                         currentSocio.exitType = "NON";
@@ -260,11 +265,32 @@ namespace Gimnasio.Utilidades
             return result;
         }
 
-        private bool comprobarFechaVencimiento(SocioModel socio)
+        private bool comprobarTarjetaMaestra(SocioModel socio)
         {
             bool result = false;
 
-            int relation = DateTime.Compare(socio.vencimiento, DateTime.Now);
+            if (socio.idSocio == "0000")
+            {
+                result = true;
+            }
+            else
+            {
+                result = false;
+            }
+
+            return result;
+        }
+        
+
+        private bool comprobarFechaVencimiento(SocioModel socio)
+        {
+            bool result = false;
+            DateTime date = DateTime.Now;
+            //date = date.AddDays(31);
+            //date = date.AddMonths(3);
+            //date = date.AddYears(1);
+
+            int relation = DateTime.Compare(socio.vencimiento, date);
             if (relation > 0)
             {
                 result = true;
@@ -292,7 +318,7 @@ namespace Gimnasio.Utilidades
                 int year = DateTime.Now.Year;
 
                 DateTime currentTime = DateTime.Now;
-                DateTime horaLimiteManana = new DateTime(year, month, day, 13, 59, 59);
+                DateTime horaLimiteManana = new DateTime(year, month, day, 12, 59, 59);
                 int output = DateTime.Compare(currentTime, horaLimiteManana);
 
                 if (output < 0)

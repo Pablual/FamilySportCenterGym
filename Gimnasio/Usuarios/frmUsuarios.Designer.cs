@@ -35,24 +35,25 @@
             // 
             // spContenedor
             // 
-            this.spContenedor.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             // 
             // spContenedor.Panel1
             // 
             this.spContenedor.Panel1.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.spContenedor.Panel1MinSize = 100;
             // 
             // spContenedor.Panel2
             // 
             this.spContenedor.Panel2.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.spContenedor.Panel2MinSize = 100;
-            this.spContenedor.Size = new System.Drawing.Size(823, 503);
+            this.spContenedor.Size = new System.Drawing.Size(823, 561);
             this.spContenedor.SplitterDistance = 105;
+            // 
+            // cmdAbilitar
+            // 
+            this.cmdAbilitar.Text = "Habilitar";
             // 
             // frmUsuarios
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
-            this.ClientSize = new System.Drawing.Size(823, 503);
+            this.ClientSize = new System.Drawing.Size(823, 561);
             this.Margin = new System.Windows.Forms.Padding(6);
             this.Name = "frmUsuarios";
             this.Text = "Usuarios";

@@ -36,12 +36,9 @@
             // spContenedor
             // 
             // 
-            // cmdEliminar
-            // 
-         
-            // 
             // cmdAbilitar
             // 
+            this.cmdAbilitar.Text = "Habilitar";
             this.cmdAbilitar.Visible = false;
             // 
             // cmdDesabilitar

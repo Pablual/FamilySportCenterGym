@@ -38,6 +38,10 @@
             this.spContenedor.Size = new System.Drawing.Size(817, 600);
             this.spContenedor.SplitterDistance = 105;
             // 
+            // cmdAbilitar
+            // 
+            this.cmdAbilitar.Text = "Habilitar";
+            // 
             // frmMembresias
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);

@@ -36,6 +36,10 @@
             // spContenedor
             // 
             // 
+            // cmdAbilitar
+            // 
+            this.cmdAbilitar.Text = "Habilitar";
+            // 
             // frmProductos
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);

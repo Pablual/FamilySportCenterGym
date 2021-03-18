@@ -135,7 +135,7 @@
             this.cmdAbilitar.Name = "cmdAbilitar";
             this.cmdAbilitar.Size = new System.Drawing.Size(78, 31);
             this.cmdAbilitar.TabIndex = 10;
-            this.cmdAbilitar.Text = "Abilitar";
+            this.cmdAbilitar.Text = "Habilitar";
             this.cmdAbilitar.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.cmdAbilitar.UseVisualStyleBackColor = true;
             // 
