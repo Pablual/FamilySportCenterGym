@@ -68,6 +68,7 @@ namespace Gimnasio
                 {
                     IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
                     byte[] bytes = listener.Receive(ref RemoteIpEndPoint);
+                    IPAddress RemoteIpEndPointAddress = RemoteIpEndPoint.Address;
                     string idUsuarioConvert = Encoding.ASCII.GetString(bytes, 0, bytes.Length);
                     string idUsuario = ConvertHex(idUsuarioConvert);
 
@@ -78,9 +79,9 @@ namespace Gimnasio
                         clsSistemaApertura torno = new clsSistemaApertura();
 
                         //Comprobamos si el idUsuario es un numero
-                        if ( !string.IsNullOrEmpty(idUsuario) && ExpresionesRegulares.RegEX.isNumber(idUsuario))
+                        if (!string.IsNullOrEmpty(idUsuario) && ExpresionesRegulares.RegEX.isNumber(idUsuario))
                         {
-                            currentSocio = torno.comprobarSocio(idUsuario);
+                            currentSocio = torno.comprobarSocio(idUsuario, RemoteIpEndPointAddress);
 
                             if (currentSocio.isSocioEnabled == true)
                             {
@@ -95,8 +96,9 @@ namespace Gimnasio
                                     myTimer.Start();
 
                                 }
-                                //TODO poner el boton del torno en verde y en rojo cuando se cierre con la respuesta de arduino
-                                torno.enviar(currentSocio);
+                                //TODO ReturnRemoteAddress
+                                torno.enviar(currentSocio, RemoteIpEndPointAddress);
+                                //torno.enviar(currentSocio);
                             }
                             else
                             {
@@ -108,7 +110,9 @@ namespace Gimnasio
                             clsSistemaApertura cls = new clsSistemaApertura();
                             SocioModel currentSocioError = new SocioModel();
                             currentSocioError.exitType = "NON";
-                            cls.enviar(currentSocioError);
+                            //TODO ReturnRemoteAddress
+                            cls.enviar(currentSocioError, RemoteIpEndPointAddress);
+                            //cls.enviar(currentSocioError);
                             MessageBox.Show("La clave es numerica, debes introducir solo numeros");
                             return;
                         }
@@ -179,7 +183,7 @@ namespace Gimnasio
         {
             frmMNFC.Close();
             myTimer.Stop();
-           // myTimer.Enabled = true;
+            // myTimer.Enabled = true;
         }
 
         private bool detectarFormularioAbierto(string formulario)
@@ -337,10 +341,14 @@ namespace Gimnasio
         {
             try
             {
-                    SocioModel currentSocio = new SocioModel();
-                    clsSistemaApertura sitemaApertura = new clsSistemaApertura();
-                    currentSocio.exitType = "BTH";
-                    sitemaApertura.enviar(currentSocio);
+                SocioModel currentSocio = new SocioModel();
+                clsSistemaApertura sitemaApertura = new clsSistemaApertura();
+                currentSocio.exitType = "BTH";
+                //TODO ReturnRemoteAddress
+                //string ipAddress = "192.168.1.102";
+                //IPAddress ip = IPAddress.Parse(ipAddress);
+                //sitemaApertura.enviar(currentSocio,ip);
+                sitemaApertura.enviar(currentSocio);
             }
             catch (Exception ex)
             {

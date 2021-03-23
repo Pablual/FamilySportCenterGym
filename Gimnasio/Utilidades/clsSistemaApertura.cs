@@ -16,7 +16,7 @@ namespace Gimnasio.Utilidades
     {
         public clsSistemaApertura() { }
 
-        public SocioModel comprobarSocio(string idUsuario)
+        public SocioModel comprobarSocio(string idUsuario, IPAddress RemoteIpEndPointAddress)
         {
             #region Variables
             int idSocio = Convert.ToInt32(idUsuario);
@@ -147,7 +147,9 @@ namespace Gimnasio.Utilidades
                     if (result == DialogResult.OK)
                     {
                         currentSocio.exitType = "NON";
-                        enviar(currentSocio);
+                        //TODO ReturnRemoteAddress
+                        enviar(currentSocio, RemoteIpEndPointAddress);
+                        //enviar(currentSocio);
                     }
                 }
             }
@@ -166,7 +168,9 @@ namespace Gimnasio.Utilidades
                         if (result == DialogResult.OK)
                         {
                             currentSocio.exitType = "NON";
-                            enviar(currentSocio);
+                            //TODO ReturnRemoteAddress
+                            enviar(currentSocio, RemoteIpEndPointAddress);
+                            //enviar(currentSocio);
                         }
                     }
                 }
@@ -177,15 +181,68 @@ namespace Gimnasio.Utilidades
                     if (result == DialogResult.OK)
                     {
                         currentSocio.exitType = "NON";
-                        enviar(currentSocio);
+                        //TODO ReturnRemoteAddress
+                        enviar(currentSocio, RemoteIpEndPointAddress);
+                        //enviar(currentSocio);
                     }
                 }
             }
             else
             {
                 currentSocio.isSocioEnabled = false;
+                DialogResult result = MessageBox.Show("El socio tiene la membresia caducada");
+                if (result == DialogResult.OK)
+                {
+                    currentSocio.exitType = "NON";
+                    //TODO ReturnRemoteAddress
+                    enviar(currentSocio, RemoteIpEndPointAddress);
+                    //enviar(currentSocio);
+                }
             }
             return currentSocio;
+        }
+
+        public bool enviar(SocioModel currentSocio, IPAddress RemoteIpEndPointAddress)
+        {   
+            try
+            {
+                #region TCP
+                //string requestUrl = "http://192.168.0.36/";
+                //WebRequest request = HttpWebRequest.Create(requestUrl);
+                //request.Method = "POST";
+                //request.ContentType = "application/x-www-form-urlencoded";
+                //string postData = "myparam1=myvalue1&myparam2=myvalue2";
+                //using (var writer = new StreamWriter(request.GetRequestStream()))
+                //{
+                //    writer.Write(postData);
+                //}
+                //string responseFromRemoteServer;
+                //using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                //{
+                //    using (StreamReader reader = new StreamReader(response.GetResponseStream()))
+                //    {
+                //        responseFromRemoteServer = reader.ReadToEnd();
+                //    }
+                //}
+                #endregion
+
+                #region UPD
+                string ipAddress = RemoteIpEndPointAddress.ToString();
+                IPAddress ip = IPAddress.Parse(ipAddress);
+                string port = "8080";
+                string mensaje = currentSocio.exitType;
+
+                UdpClient udpClient = new UdpClient();
+                udpClient.Connect(ip, Convert.ToInt16(port));
+                Byte[] senddata = Encoding.ASCII.GetBytes(mensaje);
+                udpClient.Send(senddata, senddata.Length);
+                #endregion
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            return true;
         }
 
         public bool enviar(SocioModel currentSocio)
@@ -213,7 +270,7 @@ namespace Gimnasio.Utilidades
                 #endregion
 
                 #region UPD
-                string ipAddress = "192.168.1.102";
+                string ipAddress = "192.168.0.34";
                 IPAddress ip = IPAddress.Parse(ipAddress);
                 string port = "8080";
                 string mensaje = currentSocio.exitType;
