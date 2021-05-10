@@ -313,16 +313,16 @@ namespace Gimnasio.Socios
             this.groupBox1.TabIndex = 16;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Socio";
-            // 
-            // button3
-            // 
-            this.button3.Location = new System.Drawing.Point(477, 176);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(153, 33);
-            this.button3.TabIndex = 31;
-            this.button3.Text = "Agregar Tarjeta";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += delegate (object sender, EventArgs e) { this.button3_Click(sender,e, label10.Text.ToString()); };
+            //// 
+            //// button3
+            //// 
+            //this.button3.Location = new System.Drawing.Point(477, 176);
+            //this.button3.Name = "button3";
+            //this.button3.Size = new System.Drawing.Size(153, 33);
+            //this.button3.TabIndex = 31;
+            //this.button3.Text = "Agregar Tarjeta";
+            //this.button3.UseVisualStyleBackColor = true;
+            //this.button3.Click += delegate (object sender, EventArgs e) { this.button3_Click(sender,e, label10.Text.ToString()); };
             // 
             // pbFoto
             // 

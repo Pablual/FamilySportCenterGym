@@ -113,7 +113,7 @@ namespace Gimnasio
                             //TODO ReturnRemoteAddress
                             cls.enviar(currentSocioError, RemoteIpEndPointAddress);
                             //cls.enviar(currentSocioError);
-                            MessageBox.Show("La clave es numerica, debes introducir solo numeros");
+                            MessageBox.Show("1.La clave es numerica, debes introducir solo numeros");
                             return;
                         }
                     }));

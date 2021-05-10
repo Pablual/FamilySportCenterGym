@@ -111,7 +111,7 @@ namespace Gimnasio.Registro
                 {
                     if (!ExpresionesRegulares.RegEX.isNumber(idUsuario))
                     {
-                        DialogResult result = MessageBox.Show("La clave es numerica, debes introducir solo numeros");
+                        DialogResult result = MessageBox.Show("2.La clave es numerica, debes introducir solo numeros");
                         if (result == DialogResult.OK)
                         {
                             SocioModel currentSocio = new SocioModel();
@@ -128,7 +128,7 @@ namespace Gimnasio.Registro
                 {
                     if (!ExpresionesRegulares.RegEX.isNumber(txtClave.Text.ToString()))
                     {
-                        MessageBox.Show("La clave es numerica, debes introducir solo numeros");
+                        MessageBox.Show("3.La clave es numerica, debes introducir solo numeros");
                         return;
                     }
                     clave = int.Parse(txtClave.Text.ToString());

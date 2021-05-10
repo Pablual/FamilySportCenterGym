@@ -270,7 +270,7 @@ namespace Gimnasio.Utilidades
                 #endregion
 
                 #region UPD
-                string ipAddress = "192.168.0.34";
+                string ipAddress = "192.168.1.102";
                 IPAddress ip = IPAddress.Parse(ipAddress);
                 string port = "8080";
                 string mensaje = currentSocio.exitType;

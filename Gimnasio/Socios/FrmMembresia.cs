@@ -166,17 +166,17 @@ namespace Gimnasio.Socios
             }
         }
 
-        private void button3_Click(object sender, EventArgs e, string Id)
-        {
-            //Perder el foco
-            //crear Serial Port
-            ArduinoPort = new System.IO.Ports.SerialPort();
-            ArduinoPort.PortName = "COM4";  //sustituir por vuestro 
-            ArduinoPort.BaudRate = 9600;
-            ArduinoPort.Open();
-            ArduinoPort.Write(Id);
-            if (ArduinoPort.IsOpen) ArduinoPort.Close();
-            refrescaLista();
-        }
+        //private void button3_Click(object sender, EventArgs e, string Id)
+        //{
+        //    //Perder el foco
+        //    //crear Serial Port
+        //    ArduinoPort = new System.IO.Ports.SerialPort();
+        //    ArduinoPort.PortName = "COM4";  //sustituir por vuestro 
+        //    ArduinoPort.BaudRate = 9600;
+        //    ArduinoPort.Open();
+        //    ArduinoPort.Write(Id);
+        //    if (ArduinoPort.IsOpen) ArduinoPort.Close();
+        //    refrescaLista();
+        //}
     }
 }
